@@ -45,9 +45,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'api.apps.ApiConfig',
     'rest_framework',
-    "corsheaders",
+    'corsheaders',
     'rest_framework_simplejwt',
     # 'dj_rest_auth',
+    'django.contrib.sites',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -90,10 +91,11 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
     'ROTATE_REFRESH_TOKENS': True,
     'ALGORITHM': 'HS256',
-    'SIGNING_KEY': os.environ.get('JWT_SECRET_KEY'),
+    # 'SIGNING_KEY': os.environ.get('JWT_SECRET_KEY'),
 }
 
 AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
@@ -102,8 +104,8 @@ SITE_ID = 1
 
 LOGIN_REDIRECT_URL = '/' #you can remove this if you do not want automatic redirecting
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
-ACCOUNT_EMAIL_VERIFICATION = True
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': ['profile', 'email'],
@@ -122,6 +124,8 @@ SOCIALACCOUNT_PROVIDERS = {
         'AUTH_PARAMS': {'access_type': 'online'},
     },
 }
+
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
 AUTH_USER_MODEL = 'api.User'
