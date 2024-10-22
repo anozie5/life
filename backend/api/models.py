@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractUser
 # Create your models here.
 # user model
 class User(AbstractUser):
+    username = models.CharField(max_length=100, unique=True)
     email = models.EmailField(unique=True)
     age = models.IntegerField(null=True, blank=True)
     is_active = models.BooleanField(default=True)

@@ -15,23 +15,30 @@ class SignUpSerializer(serializers.ModelSerializer):
             'is_staff': {'read_only': True}
         }
 
-        def create(self, validated_data):
-            user = super().create(validated_data)
-            user.set_password(validated_data['password'])
-            user.save()
-            # return user
+    def create(self, validated_data):
+        validated_data.pop('is_active', None)
+        validated_data.pop('is_staff', None)
 
-            refresh = RefreshToken.for_user(user)
-            token = str(refresh.access_token)
-            return {'refresh': str(refresh), 'access': token}
+        user = super().create(validated_data)
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
+
+        # refresh = RefreshToken.for_user(user)
+        # return {
+        #     'refresh': str(refresh),
+        #     'access': str(refresh.access_token)
+        # }
 
         
 #serializer for user login
 class LogInSerializer(TokenObtainPairSerializer):
+    email = serializers.EmailField(required=True)
+
+    
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-
         token['email'] = user.email
         return token
 
@@ -39,16 +46,38 @@ class LogInSerializer(TokenObtainPairSerializer):
         model = User
         fields = ['email', 'password']
 
-# class LogInSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = User
-#         fields = ['email','password']
-    
-#     @classmethod
-#     def get_token(cls, user):
-#         token = super().get_token(user)
-#         token['email'] = user.email
-#         return token
+    def validate(self, attrs):
+        email = attrs.get('email')
+        password = attrs.get('password')
+
+        if email and password:
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                raise serializers.ValidationError('User with this email does not exist.')
+
+            if not user.check_password(password):
+                raise serializers.ValidationError('Incorrect password.')
+
+            attrs['user'] = user
+        else:
+            raise serializers.ValidationError('Both email and password are required.')
+
+        return attrs
+
+
+
+
+    # @classmethod
+    # def get_token(cls, user):
+    #     token = super().get_token(user)
+
+    #     token['email'] = user.email
+    #     return token
+
+    # class Meta:
+    #     model = User
+    #     fields = ['email', 'password']
 
 
 #serializer for user token

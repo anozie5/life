@@ -16,6 +16,20 @@ class SignUpView(generics.CreateAPIView):
 
     permission_classes = [AllowAny]
 
+    #you can remove it
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)  # Validate incoming data
+        user = serializer.save()  # Call create method in the serializer
+
+        # Generate tokens for the new user
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            'refresh': str(refresh),  # Return refresh token
+            'access': str(refresh.access_token),  # Return access token
+            'user': serializer.data  # Include user data in the response
+        }, status=201)  # HTTP 201 Created
+
 #login view
 class LoginView(TokenObtainPairView):
     serializer_class = LogInSerializer
