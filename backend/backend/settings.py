@@ -109,18 +109,19 @@ SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': ['profile', 'email'],
         'AUTH_PARAMS': {'access_type': 'online'},
+        'OAUTH_PKCE_ENABLED': True,
     },
     'facebook': {
-        'SCOPE': ['profile', 'email'],
-        'AUTH_PARAMS': {'access_type': 'online'},
+        'SCOPE': ['public_profile', 'email'],
+        'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
     },
     'instagram': {
-        'SCOPE': ['profile', 'email'],
+        'SCOPE': ['user_profile', 'user_media'],
         'AUTH_PARAMS': {'access_type': 'online'},
     },
     'linkedin': {
-        'SCOPE': ['profile', 'email'],
-        'AUTH_PARAMS': {'access_type': 'online'},
+        'SCOPE': ['r_liteprofile', 'r_emailaddress'],
+        'AUTH_PARAMS': {'access_type': 'offline'},
     },
 }
 
