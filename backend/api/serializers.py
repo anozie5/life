@@ -1,6 +1,5 @@
 from .models import *
 from rest_framework import serializers
-# from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
@@ -8,7 +7,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 class SignUpSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['first_name','last_name','username','age','email','password','is_active','is_staff']
+        fields = ['first_name','last_name','username','age','email','password']
         extra_kwargs = {
             'password': {'write_only': True, 'min_length': 8},
             'is_active': {'read_only': True},
@@ -16,9 +15,6 @@ class SignUpSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        validated_data.pop('is_active', None)
-        validated_data.pop('is_staff', None)
-
         user = super().create(validated_data)
         user.set_password(validated_data['password'])
         user.save()
@@ -58,6 +54,10 @@ class LogInSerializer(TokenObtainPairSerializer):
 
             if not user.check_password(password):
                 raise serializers.ValidationError('Incorrect password.')
+            
+            #can remove, just to check for inactive users
+            if not user.is_active:
+                raise serializers.ValidationError('User account is inactive.')
 
             attrs['user'] = user
         else:
@@ -65,19 +65,6 @@ class LogInSerializer(TokenObtainPairSerializer):
 
         return attrs
 
-
-
-
-    # @classmethod
-    # def get_token(cls, user):
-    #     token = super().get_token(user)
-
-    #     token['email'] = user.email
-    #     return token
-
-    # class Meta:
-    #     model = User
-    #     fields = ['email', 'password']
 
 
 #serializer for user token

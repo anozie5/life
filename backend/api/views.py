@@ -16,7 +16,6 @@ class SignUpView(generics.CreateAPIView):
 
     permission_classes = [AllowAny]
 
-    #you can remove it
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)  # Validate incoming data
@@ -36,112 +35,30 @@ class LoginView(TokenObtainPairView):
 
     permission_classes = [AllowAny]
 
-
-
-#signup view
-# class SignUpView(generics.CreateAPIView):
-#     # queryset = User.objects.all()
-#     serializer_class = SignUpSerializer 
-
-#     permission_classes = [AllowAny]
-
-#     def create(self, request, *args, **kwargs):
-#         serializer = self.get_serializer(data=request.data)
-
-#         serializer.is_valid(raise_exception=True)
-#         user = serializer.save()
-
-#         refresh = RefreshToken.for_user(user)
-#         token = str(refresh.access_token)
-
-#         return Response({'user': '{user} created', 'token': 'token created'}, status=status.HTTP_201_CREATED)
-
-# #login view
-# class LoginView(APIView):
-#     permission_classes = [AllowAny]
-
-#     def post(self, request):
-#         serializer = LogInSerializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-
-#         email = serializer.validated_data['email']
-#         password = serializer.validated_data['password']
-
-#         # Authenticate the user
-#         user = authenticate(email=email, password=password)
-
-#         if user is not None:
-#             # If authentication is successful, generate JWT tokens
-#             refresh = RefreshToken.for_user(user)
-#             return Response({
-#                 'refresh': str(refresh),
-#                 'access': str(refresh.access_token),
-#             }, status=status.HTTP_200_OK)
-#         else:
-#             # If authentication fails, return an error response
-#             return Response(
-#                 {"detail": "Invalid credentials, please try again."}, 
-#                 status=status.HTTP_401_UNAUTHORIZED
-#             )
-
-
-
-        # serializer.is_valid(raise_exception=True)
-
-        # user = authenticate(
-        #     email=serializer.validated_data['email'], 
-        #     password=serializer.validated_data['password']
-        # )
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         
-        # if user is not None:
-        #     refresh = RefreshToken.for_user(user)
-        #     return Response('User logged in successfully', status=status.HTTP_202_ACCEPTED)
-        # else:
-        #     return Response(
-        #         {"detail": "Invalid credentials"}, 
-        #         status=status.HTTP_401_UNAUTHORIZED
-        #     )
+        # Get the user object from the validated data
+        user = serializer.validated_data['user']
+        
+        # Generate tokens for the user
+        refresh = RefreshToken.for_user(user)
+        
+        # Serialize user data (e.g., using another serializer or manual serialization)
+        user_data = {
+            'username': user.username,
+            'email': user.email,
+            # Add any other fields you want to include in the response
+        }
+
+        return Response({
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+            'user': user_data  # Return serialized user data instead of the object itself
+        })
 
 
-
-
-
-        # if user.is_valid():
-        #     refresh = RefreshToken.for_user(user)
-        #     token = str(refresh.access_token)
-        #     # return Response({'user': user.data, 'token': token}, status=status.HTTP_202_ACCEPTED)
-        #     return Response('{user.username} is logged in', status=status.HTTP_202_ACCEPTED)
-
-# class LoginView(generics.GenericAPIView):
-#     serializer_class = LogInSerializer
-#     permission_classes = [AllowAny]
-
-#     def post(self, request):
-#         serializer = self.get_serializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-#         user = serializer.validated_data['user']
-
-#         refresh = RefreshToken.for_user(user)
-#         token = str(refresh.access_token)
-
-#         return Response({'user': serializer.data, 'token': token}, status=status.HTTP_200_OK)
-
-
-# #signup view
-# class SignUpView(generics.CreateAPIView):
-#     permission_classes = [AllowAny]
-#     serializer_class = SignUpSerializer
-
-
-# #login view
-# class LoginView(generics.GenericAPIView):
-#     permission_classes = [AllowAny]
-#     serializer_class = LogInSerializer
-
-#     def post(self, request):
-#         serializer = self.get_serializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-#         return Response(serializer.validated_data)
 
 
 #token view
