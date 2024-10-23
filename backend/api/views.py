@@ -16,7 +16,7 @@ class SignUpView(generics.CreateAPIView):
 
     permission_classes = [AllowAny]
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)  # Validate incoming data
         user = serializer.save()  # Call create method in the serializer
@@ -27,7 +27,7 @@ class SignUpView(generics.CreateAPIView):
             'refresh': str(refresh),  # Return refresh token
             'access': str(refresh.access_token),  # Return access token
             'user': serializer.data  # Include user data in the response
-        }, status=201)  # HTTP 201 Created
+        }, status=status.HTTP_201_CREATED)
 
 #login view
 class LoginView(TokenObtainPairView):
@@ -35,7 +35,7 @@ class LoginView(TokenObtainPairView):
 
     permission_classes = [AllowAny]
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         
@@ -45,18 +45,16 @@ class LoginView(TokenObtainPairView):
         # Generate tokens for the user
         refresh = RefreshToken.for_user(user)
         
-        # Serialize user data (e.g., using another serializer or manual serialization)
         user_data = {
             'username': user.username,
             'email': user.email,
-            # Add any other fields you want to include in the response
         }
 
         return Response({
             'refresh': str(refresh),
             'access': str(refresh.access_token),
             'user': user_data  # Return serialized user data instead of the object itself
-        })
+        }, status= status.HTTP_200_OK)
 
 
 

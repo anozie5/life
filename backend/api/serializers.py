@@ -10,21 +10,13 @@ class SignUpSerializer(serializers.ModelSerializer):
         fields = ['first_name','last_name','username','age','email','password']
         extra_kwargs = {
             'password': {'write_only': True, 'min_length': 8},
-            'is_active': {'read_only': True},
-            'is_staff': {'read_only': True}
         }
 
     def create(self, validated_data):
         user = super().create(validated_data)
         user.set_password(validated_data['password'])
         user.save()
-        return user
-
-        # refresh = RefreshToken.for_user(user)
-        # return {
-        #     'refresh': str(refresh),
-        #     'access': str(refresh.access_token)
-        # }
+        return(user)
 
         
 #serializer for user login

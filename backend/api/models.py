@@ -7,9 +7,7 @@ class User(AbstractUser):
     username = models.CharField(max_length=100, unique=True)
     email = models.EmailField(unique=True)
     age = models.IntegerField(null=True, blank=True)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-
+    
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
